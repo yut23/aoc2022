@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+
+day=${1:-$(date +%-d)}
+if ! [[ -e input/day$day/input.txt ]]; then
+  ./get_input.sh "$day"
+fi
+
+declare -a to_edit
+if ! [[ -e input/day$day/example1.txt ]]; then
+  to_edit+=("input/day$day/example1.txt")
+fi
+source_file="src/day$day.cpp"
+if ! [[ -e $source_file ]]; then
+  sed 's/{{DAY}}/'"$day"'/g; s/{{DATE}}/'"$(date +%F)"'/g' src/template.cpp > "$source_file"
+fi
+to_edit+=("$source_file" src/lib.h)
+
+NVIM_GUI=1 nvim-qt -- -O "${to_edit[@]}"

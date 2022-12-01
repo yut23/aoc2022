@@ -1,0 +1,56 @@
+#!/bin/bash
+set -euo pipefail
+
+usage() {
+  echo "Usage: aoc [day] [-e [example number]|-i <input file name>]"
+}
+
+input_name=input.txt
+day=$(date +%-d)
+
+first_iter=y
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -e|--example)
+      input_name=example1.txt
+      if [[ $# -gt 1 ]]; then
+        # example number given
+        input_name=example$2.txt
+        shift
+      fi
+      shift
+      ;;
+    -i|--input)
+      input_name=$2
+      shift
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -*)
+      echo "Error: unrecognized option '$1'"
+      usage
+      exit 1
+      ;;
+    *)
+      if [[ $first_iter == y ]]; then
+        day=$1
+        shift
+      else
+        echo "Error: day can only be in the first argument"
+        usage
+        exit 1
+      fi
+      ;;
+  esac
+  first_iter=n
+done
+
+# rebuild if make says it's necessary
+binary=bin/day$day
+make -q "$binary" 2>/dev/null || make "$binary"
+
+# run on the specified input
+"$binary" "input/day$day/$input_name"
