@@ -5,6 +5,9 @@ usage() {
   echo "Usage: aoc [day] [-e [example number]|-i <input file name>]"
 }
 
+# cd to directory of this script (repository root)
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+
 input_name=input.txt
 day=$(date +%-d)
 
