@@ -12,8 +12,10 @@ list:
 	@printf 'debug:  %s\n' $(DEBUG_EXECUTABLES)
 
 bin/%: src/%.cpp src/lib.h
+	@mkdir -p bin
 	$(CXX) $(LOCAL_CXXFLAGS) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
 debug/%: src/%.cpp src/lib.h
+	@mkdir -p debug
 	$(CXX) $(DEBUG_CXXFLAGS) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
 
 clean:

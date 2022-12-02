@@ -55,5 +55,6 @@ done
 binary=bin/day$day
 make -q "$binary" 2>/dev/null || make "$binary"
 
+echo "Day $day:"
 # run on the specified input
 "$binary" "input/day$day/$input_name"
