@@ -1,5 +1,5 @@
 CXX = clang++
-LOCAL_CXXFLAGS = -Wall -O3 -std=c++20 #$(shell pkg-config --cflags $(libs_$(notdir $*)))
+LOCAL_CXXFLAGS = -Wall -O3 -std=c++20 -fsanitize=undefined -fsanitize=address #$(shell pkg-config --cflags $(libs_$(notdir $*)))
 DEBUG_CXXFLAGS = $(LOCAL_CXXFLAGS) -g -Og -DDEBUG_MODE
 LDFLAGS = -Wl,--as-needed #$(shell pkg-config --libs $(libs_$(notdir $*)))
 
