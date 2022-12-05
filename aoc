@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: aoc [day] [-e [example number]|-i <input file name>]"
+  echo "Usage: aoc [day] [-d] [-e [example number]|-i <input file name>]"
 }
 
 # cd to directory of this script (repository root)
@@ -10,10 +10,15 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
 input_name=input.txt
 day=$(date +%-d)
+debug=n
 
 first_iter=y
 while [[ $# -gt 0 ]]; do
   case $1 in
+    -d|--debug)
+      debug=y
+      shift
+      ;;
     -e|--example)
       input_name=example1.txt
       if [[ $# -gt 1 ]]; then
@@ -53,6 +58,9 @@ done
 
 # rebuild if make says it's necessary
 binary=bin/day$day
+if [[ $debug == y ]]; then
+  binary=$binary.debug
+fi
 make -q "$binary" 2>/dev/null || make "$binary"
 
 echo "Day $day:"
