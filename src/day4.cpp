@@ -28,6 +28,11 @@ struct Pair {
     return (first.start <= second.start && first.end >= second.end) ||
            (second.start <= first.start && second.end >= first.end);
   }
+
+  bool overlaps() {
+    return (first.start <= second.start && second.start <= first.end) ||
+           (second.start <= first.start && first.start <= second.end);
+  }
 };
 
 std::istream &operator>>(std::istream &is, Pair &p) {
@@ -40,7 +45,7 @@ int main(int argc, char **argv) {
 
   // read file line-by-line
   std::string line;
-  int count = 0;
+  int include_count = 0, overlap_count = 0;
   while (std::getline(infile, line)) {
     // simple and stupid: replace '-' and ',' with space
     std::ranges::replace_if(
@@ -51,9 +56,13 @@ int main(int argc, char **argv) {
     ss >> pair;
 
     if (pair.includes()) {
-      ++count;
+      ++include_count;
+    }
+    if (pair.overlaps()) {
+      ++overlap_count;
     }
   }
-  std::cout << count << std::endl;
+  std::cout << include_count << std::endl;
+  std::cout << overlap_count << std::endl;
   return EXIT_SUCCESS;
 }
