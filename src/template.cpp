@@ -6,6 +6,7 @@
  *****************************************************************************/
 
 #include "lib.h"
+#include <algorithm>
 #include <string>
 
 int main(int argc, char **argv) {
