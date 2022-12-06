@@ -7,6 +7,7 @@ usage() {
 
 # cd to directory of this script (repository root)
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+source ./lib.sh
 
 input_name=input.txt
 day=$(date +%-d)
@@ -56,12 +57,13 @@ while [[ $# -gt 0 ]]; do
   first_iter=n
 done
 
-# rebuild if make says it's necessary
 binary=bin/day$day
 if [[ $debug == y ]]; then
   binary=$binary.debug
 fi
-make -q "$binary" 2>/dev/null || make "$binary"
+
+# rebuild if make says it's necessary
+make_quiet "$binary"
 
 echo "Day $day:"
 # run on the specified input

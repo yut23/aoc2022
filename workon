@@ -3,6 +3,7 @@ set -euo pipefail
 
 # cd to directory of this script (repository root)
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+source ./lib.sh
 
 day=${1:-$(date +%-d)}
 if ! [[ -e input/day$day/input.txt ]]; then
@@ -18,5 +19,11 @@ if ! [[ -e $source_file ]]; then
   sed 's/{{DAY}}/'"$day"'/g; s/{{DATE}}/'"$(date +%F)"'/g' src/template.cpp > "$source_file"
 fi
 to_edit+=("$source_file" src/lib.h)
+
+# update the entire compilation database if needed
+make_quiet compile_commands.json
+# build this day's binaries so the compilation database gets updated
+make_quiet "bin/day$day"
+make_quiet "bin/day$day.debug"
 
 NVIM_GUI=1 nvim-qt -- -O "${to_edit[@]}"
