@@ -6,7 +6,7 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
 day=${1:-$(date +%-d)}
 if ! [[ -e input/day$day/input.txt ]]; then
-  ./get_input.sh "$day"
+  bash get_input.sh "$day"
 fi
 
 declare -a to_edit
