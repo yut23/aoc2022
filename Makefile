@@ -6,7 +6,7 @@ BEAR_ARGS = --config bear_config.json
 
 EXECUTABLES := $(patsubst src/%.cpp,bin/%,$(wildcard src/day*.cpp))
 DEBUG_EXECUTABLES := $(EXECUTABLES:%=%.debug)
-all: $(EXECUTABLES) compile_commands.json #$(DEBUG_EXECUTABLES)
+all: compile_commands.json $(EXECUTABLES) #$(DEBUG_EXECUTABLES)
 debug: $(DEBUG_EXECUTABLES)
 
 list:
@@ -15,7 +15,8 @@ list:
 
 compile_commands.json: Makefile
 	@echo "Makefile changed, rebuilding entire compilation database..."
-	bear $(BEAR_ARGS) -- make -B $(EXECUTABLES) $(DEBUG_EXECUTABLES)
+	rm -f compile_commands.json
+	make -B $(EXECUTABLES) $(DEBUG_EXECUTABLES)
 
 bin/%: src/%.cpp src/lib.h
 	@mkdir -p bin
