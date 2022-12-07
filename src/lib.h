@@ -14,8 +14,8 @@
 #include <iostream>
 
 void usage(int argc, char **argv) {
-  assert(argc >= 1);
-  std::cout << "Usage: " << argv[0] << " <input file path>" << std::endl;
+    assert(argc >= 1);
+    std::cout << "Usage: " << argv[0] << " <input file path>" << std::endl;
 }
 
 /**
@@ -23,11 +23,11 @@ void usage(int argc, char **argv) {
  * @return An istream for the specified input file.
  */
 std::ifstream parse_args(int argc, char **argv) {
-  if (argc != 2) {
-    usage(argc, argv);
-    exit(EXIT_FAILURE);
-  }
-  return std::ifstream{argv[1]};
+    if (argc != 2) {
+        usage(argc, argv);
+        exit(EXIT_FAILURE);
+    }
+    return std::ifstream{argv[1]};
 }
 
 #endif /* end of include guard: LIB_H_AT4RFPRV */
