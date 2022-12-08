@@ -6,10 +6,12 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <cassert>
-#include <string>
-#include <string_view>
-#include <unordered_set>
+#include <cassert>       // for assert
+#include <iostream>      // for cout, cerr
+#include <iterator>      // for distance
+#include <string>        // for string, getline
+#include <string_view>   // for string_view
+#include <unordered_set> // for unordered_multiset
 
 namespace aoc::day6 {
 
@@ -60,12 +62,12 @@ int find_marker(std::string text, int window_size) {
 } // namespace aoc::day6
 
 int main(int argc, char **argv) {
-    auto infile = aoc::parse_args(argc, argv);
+    std::ifstream infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
     infile >> line;
     std::cout << aoc::day6::find_marker(line, 4) << std::endl;
     std::cout << aoc::day6::find_marker(line, 14) << std::endl;
-    return EXIT_SUCCESS;
+    return 0;
 }

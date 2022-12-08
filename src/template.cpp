@@ -6,7 +6,8 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <string>
+#include <iostream> // for cout
+#include <string>   // for string, getline
 
 namespace aoc::day{{DAY}} {
 
@@ -21,5 +22,5 @@ int main(int argc, char **argv) {
         using namespace aoc::day{{DAY}};
         // do stuff
     }
-    return EXIT_SUCCESS;
+    return 0;
 }

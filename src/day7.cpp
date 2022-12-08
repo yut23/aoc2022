@@ -6,12 +6,16 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <memory>
-#include <sstream>
-#include <stack>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <cassert>       // for assert
+#include <iostream>      // for cout, cerr
+#include <memory>        // for shared_ptr, make_shared, weak_ptr,
+                         //     dynamic_pointer_cast, enable_shared_from_this
+#include <sstream>       // for stringstream
+#include <stack>         // for stack
+#include <stdexcept>     // for logic_error
+#include <string>        // for string, getline
+#include <unordered_map> // for unordered_map
+#include <vector>        // for vector
 
 namespace aoc::day7 {
 
@@ -105,7 +109,7 @@ void Directory::pretty_print(std::ostream &os,
 } // namespace aoc::day7
 
 int main(int argc, char **argv) {
-    auto infile = aoc::parse_args(argc, argv);
+    std::ifstream infile = aoc::parse_args(argc, argv);
 
     using namespace aoc::day7;
     std::shared_ptr<Directory> root = std::make_shared<Directory>("/");
@@ -175,5 +179,5 @@ int main(int argc, char **argv) {
     }
     std::cout << part_1_total << std::endl;
     std::cout << part_2_min << std::endl;
-    return EXIT_SUCCESS;
+    return 0;
 }

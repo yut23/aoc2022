@@ -6,9 +6,13 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <algorithm>
-#include <string>
-#include <vector>
+#include <algorithm>  // for sort, set_union, set_intersection
+#include <functional> // for less
+#include <iostream>   // for cout, cerr
+#include <iterator>   // for back_inserter
+#include <string>     // for string, getline
+#include <utility>    // for move
+#include <vector>     // for vector
 
 namespace aoc::day3 {
 
@@ -29,7 +33,7 @@ struct Rucksack {
     Rucksack() : first{}, second{} {};
 
     explicit Rucksack(std::string &line) {
-        size_t size = line.length() / 2;
+        int size = line.length() / 2;
         second = line.substr(size, size);
         first = line.substr(0, size);
         first.resize(size);
@@ -42,7 +46,7 @@ struct Rucksack {
 } // namespace aoc::day3
 
 int main(int argc, char **argv) {
-    auto infile = aoc::parse_args(argc, argv);
+    std::ifstream infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
@@ -76,5 +80,5 @@ int main(int argc, char **argv) {
     }
     std::cout << total_1 << std::endl;
     std::cout << total_2 << std::endl;
-    return EXIT_SUCCESS;
+    return 0;
 }

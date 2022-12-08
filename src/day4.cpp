@@ -6,9 +6,10 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <algorithm>
-#include <sstream>
-#include <string>
+#include <algorithm> // for replace_if
+#include <iostream>  // for cout
+#include <sstream>   // for stringstream
+#include <string>    // for string, getline
 
 namespace aoc::day4 {
 
@@ -45,7 +46,7 @@ std::istream &operator>>(std::istream &is, Pair &p) {
 } // namespace aoc::day4
 
 int main(int argc, char **argv) {
-    auto infile = aoc::parse_args(argc, argv);
+    std::ifstream infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
@@ -69,5 +70,5 @@ int main(int argc, char **argv) {
     }
     std::cout << include_count << std::endl;
     std::cout << overlap_count << std::endl;
-    return EXIT_SUCCESS;
+    return 0;
 }

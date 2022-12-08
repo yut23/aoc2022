@@ -6,14 +6,15 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <algorithm>
-#include <functional>
-#include <numeric>
-#include <string>
-#include <vector>
+#include <algorithm>  // for sort
+#include <functional> // for greater
+#include <iostream>   // for cout
+#include <numeric>    // for accumulate
+#include <string>     // for string, getline, stoi
+#include <vector>     // for vector
 
 int main(int argc, char **argv) {
-    auto infile = aoc::parse_args(argc, argv);
+    std::ifstream infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
@@ -34,5 +35,5 @@ int main(int argc, char **argv) {
     // part 2
     std::cout << std::accumulate(calories.begin(), calories.begin() + 3, 0)
               << std::endl;
-    return EXIT_SUCCESS;
+    return 0;
 }

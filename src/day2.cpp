@@ -6,12 +6,12 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <array>
-#include <cassert>
-#include <string>
+#include <array>    // for array
+#include <cassert>  // for assert
+#include <iostream> // for cout, cerr
 
 int main(int argc, char **argv) {
-    auto infile = aoc::parse_args(argc, argv);
+    std::ifstream infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     char opponent_letter, own_letter;
@@ -57,5 +57,5 @@ int main(int argc, char **argv) {
     }
     std::cout << score[0] << std::endl;
     std::cout << score[1] << std::endl;
-    return EXIT_SUCCESS;
+    return 0;
 }

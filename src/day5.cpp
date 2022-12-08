@@ -6,15 +6,16 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <list>
-#include <string>
-#include <vector>
+#include <iostream> // for cout
+#include <list>     // for list
+#include <string>   // for string, getline
+#include <vector>   // for vector
 
 namespace aoc::day5 {
 
 template <class T> using Stacks = std::vector<std::list<T>>;
 
-template <class T> void move(Stacks<T> &stacks, size_t src, size_t dst) {
+template <class T> void move(Stacks<T> &stacks, int src, int dst) {
     stacks[dst].push_back(stacks[src].back());
     stacks[src].pop_back();
 }
@@ -22,7 +23,7 @@ template <class T> void move(Stacks<T> &stacks, size_t src, size_t dst) {
 } // namespace aoc::day5
 
 int main(int argc, char **argv) {
-    auto infile = aoc::parse_args(argc, argv);
+    std::ifstream infile = aoc::parse_args(argc, argv);
 
     // read and parse initial stacks
     aoc::day5::Stacks<char> stacks{};
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
         }
         // insert new elements at the front (bottom) of the stack, since we're
         // parsing from the top down
-        for (size_t i = 0; i < line.length(); i += 4) {
+        for (int i = 0; i < line.length(); i += 4) {
             if (line[i] == '[') {
                 stacks[i / 4].push_front(line[i + 1]);
             }
@@ -75,5 +76,5 @@ int main(int argc, char **argv) {
         std::cout << s.back();
     }
     std::cout << std::endl;
-    return EXIT_SUCCESS;
+    return 0;
 }
