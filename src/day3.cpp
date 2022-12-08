@@ -7,9 +7,10 @@
 
 #include "lib.h"
 #include <algorithm>
-#include <numeric>
 #include <string>
 #include <vector>
+
+namespace aoc::day3 {
 
 int calc_priority(char item) {
     if (item >= 'a' && item <= 'z') {
@@ -27,7 +28,7 @@ struct Rucksack {
 
     Rucksack() : first{}, second{} {};
 
-    Rucksack(std::string &line) {
+    explicit Rucksack(std::string &line) {
         size_t size = line.length() / 2;
         second = line.substr(size, size);
         first = line.substr(0, size);
@@ -38,8 +39,10 @@ struct Rucksack {
     }
 };
 
+} // namespace aoc::day3
+
 int main(int argc, char **argv) {
-    auto infile = parse_args(argc, argv);
+    auto infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
@@ -47,6 +50,7 @@ int main(int argc, char **argv) {
     int group_size = 0;
     std::string badge_options{};
     while (std::getline(infile, line)) {
+        using namespace aoc::day3;
         Rucksack sack{line};
         std::vector<char> shared{};
         std::ranges::set_intersection(sack.first, sack.second,
@@ -62,9 +66,9 @@ int main(int argc, char **argv) {
             badge_options = std::move(temp);
         }
         if (group_size == 3) {
-#ifdef DEBUG_MODE
-            std::cerr << badge_options << std::endl;
-#endif
+            if constexpr (aoc::DEBUG) {
+                std::cerr << badge_options << std::endl;
+            }
             total_2 += calc_priority(badge_options[0]);
             badge_options.clear();
             group_size = 0;

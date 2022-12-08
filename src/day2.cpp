@@ -11,7 +11,7 @@
 #include <string>
 
 int main(int argc, char **argv) {
-    auto infile = parse_args(argc, argv);
+    auto infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     char opponent_letter, own_letter;
@@ -27,8 +27,10 @@ int main(int argc, char **argv) {
                 // yuck.
                 own_hand = ((opponent_hand + (own_hand + 1) % 3) - 1) % 3 + 1;
             }
-            std::cerr << "round " << round << ", part " << part << ":";
-            std::cerr << " hand=" << own_hand << ",";
+            if constexpr (aoc::DEBUG) {
+                std::cerr << "round " << round << ", part " << part << ":";
+                std::cerr << " hand=" << own_hand << ",";
+            }
             int round_score;
             switch ((opponent_hand - own_hand + 3) % 3) {
             case 0:
@@ -47,7 +49,9 @@ int main(int argc, char **argv) {
                 assert(0);
                 break;
             }
-            std::cerr << " score=" << round_score << std::endl;
+            if constexpr (aoc::DEBUG) {
+                std::cerr << " score=" << round_score << std::endl;
+            }
             score[part - 1] += round_score + own_hand;
         }
     }

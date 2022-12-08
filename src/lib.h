@@ -13,10 +13,13 @@
 #include <fstream>
 #include <iostream>
 
-void usage(int argc, char **argv) {
-    assert(argc >= 1);
-    std::cout << "Usage: " << argv[0] << " <input file path>" << std::endl;
-}
+namespace aoc {
+
+#ifdef DEBUG_MODE
+[[maybe_unused]] constexpr bool DEBUG = true;
+#else
+constexpr bool DEBUG = false;
+#endif
 
 /**
  * @brief  Parse command line arguments.
@@ -24,10 +27,13 @@ void usage(int argc, char **argv) {
  */
 std::ifstream parse_args(int argc, char **argv) {
     if (argc != 2) {
-        usage(argc, argv);
+        assert(argc >= 1);
+        std::cout << "Usage: " << argv[0] << " <input file path>" << std::endl;
         exit(EXIT_FAILURE);
     }
     return std::ifstream{argv[1]};
 }
+
+} // namespace aoc
 
 #endif /* end of include guard: LIB_H_AT4RFPRV */

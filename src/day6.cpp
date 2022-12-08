@@ -6,11 +6,12 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <algorithm>
 #include <cassert>
 #include <string>
 #include <string_view>
 #include <unordered_set>
+
+namespace aoc::day6 {
 
 /// Returns the index of the first character after the marker occurrence.
 int find_marker(std::string text, int window_size) {
@@ -36,13 +37,14 @@ int find_marker(std::string text, int window_size) {
         }
         // add the new character to lookup
         lookup.insert(*new_it);
-#ifdef DEBUG_MODE
-        std::cerr << "old=" << std::distance(text.cbegin(), old_it) << ": "
-                  << *old_it << " new=" << std::distance(text.cbegin(), new_it)
-                  << ": " << *new_it << " count=" << count
-                  << " lookup=" << std::string_view{old_it, new_it}
-                  << " size=" << lookup.size() << std::endl;
-#endif
+        if constexpr (aoc::DEBUG) {
+            std::cerr << "old=" << std::distance(text.cbegin(), old_it) << ": "
+                      << *old_it
+                      << " new=" << std::distance(text.cbegin(), new_it) << ": "
+                      << *new_it << " count=" << count
+                      << " lookup=" << std::string_view{old_it, new_it}
+                      << " size=" << lookup.size() << std::endl;
+        }
         if (new_it - old_it >= window_size) {
             ++old_it;
         }
@@ -55,13 +57,15 @@ int find_marker(std::string text, int window_size) {
     return std::distance(text.cbegin(), new_it);
 }
 
+} // namespace aoc::day6
+
 int main(int argc, char **argv) {
-    auto infile = parse_args(argc, argv);
+    auto infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
     infile >> line;
-    std::cout << find_marker(line, 4) << std::endl;
-    std::cout << find_marker(line, 14) << std::endl;
+    std::cout << aoc::day6::find_marker(line, 4) << std::endl;
+    std::cout << aoc::day6::find_marker(line, 14) << std::endl;
     return EXIT_SUCCESS;
 }

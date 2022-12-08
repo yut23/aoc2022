@@ -13,7 +13,7 @@
 #include <vector>
 
 int main(int argc, char **argv) {
-    auto infile = parse_args(argc, argv);
+    auto infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;

@@ -6,15 +6,19 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <algorithm>
 #include <string>
 
+namespace aoc::day{{DAY}} {
+
+} // namespace aoc::day{{DAY}}
+
 int main(int argc, char **argv) {
-    auto infile = parse_args(argc, argv);
+    auto infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
     while (std::getline(infile, line)) {
+        using namespace aoc::day{{DAY}};
         // do stuff
     }
     return EXIT_SUCCESS;

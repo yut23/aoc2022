@@ -10,6 +10,8 @@
 #include <sstream>
 #include <string>
 
+namespace aoc::day4 {
+
 struct Assignment {
     int start{-1};
     int end{-1};
@@ -40,13 +42,16 @@ std::istream &operator>>(std::istream &is, Pair &p) {
     return is;
 }
 
+} // namespace aoc::day4
+
 int main(int argc, char **argv) {
-    auto infile = parse_args(argc, argv);
+    auto infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
     int include_count = 0, overlap_count = 0;
     while (std::getline(infile, line)) {
+        using namespace aoc::day4;
         // simple and stupid: replace '-' and ',' with space
         std::ranges::replace_if(
             line, [](char c) { return c == '-' || c == ','; }, ' ');

@@ -6,10 +6,11 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <algorithm>
 #include <list>
 #include <string>
 #include <vector>
+
+namespace aoc::day5 {
 
 template <class T> using Stacks = std::vector<std::list<T>>;
 
@@ -18,11 +19,13 @@ template <class T> void move(Stacks<T> &stacks, size_t src, size_t dst) {
     stacks[src].pop_back();
 }
 
+} // namespace aoc::day5
+
 int main(int argc, char **argv) {
-    auto infile = parse_args(argc, argv);
+    auto infile = aoc::parse_args(argc, argv);
 
     // read and parse initial stacks
-    Stacks<char> stacks{};
+    aoc::day5::Stacks<char> stacks{};
     std::string line;
     while (std::getline(infile, line)) {
         if (line.empty())
@@ -52,7 +55,7 @@ int main(int argc, char **argv) {
         --dst;
         // part 1
         for (int i = 0; i < count; ++i) {
-            move(stacks, src, dst);
+            aoc::day5::move(stacks, src, dst);
         }
         // part 2
         {

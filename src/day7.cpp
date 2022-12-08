@@ -6,14 +6,14 @@
  *****************************************************************************/
 
 #include "lib.h"
-#include <algorithm>
 #include <memory>
-#include <numeric>
 #include <sstream>
 #include <stack>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+namespace aoc::day7 {
 
 class Entity : public std::enable_shared_from_this<Entity> {
   private:
@@ -102,9 +102,12 @@ void Directory::pretty_print(std::ostream &os,
     }
 }
 
-int main(int argc, char **argv) {
-    auto infile = parse_args(argc, argv);
+} // namespace aoc::day7
 
+int main(int argc, char **argv) {
+    auto infile = aoc::parse_args(argc, argv);
+
+    using namespace aoc::day7;
     std::shared_ptr<Directory> root = std::make_shared<Directory>("/");
     std::vector<std::shared_ptr<Directory>> all_dirs{root};
     std::stack<std::shared_ptr<Directory>> dirstack;
@@ -149,9 +152,9 @@ int main(int argc, char **argv) {
         }
     }
 
-#ifdef DEBUG_MODE
-    root->pretty_print(std::cerr);
-#endif
+    if constexpr (aoc::DEBUG) {
+        root->pretty_print(std::cerr);
+    }
 
     constexpr int total_space = 70000000;
     constexpr int required_space = 30000000;
