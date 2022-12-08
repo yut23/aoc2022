@@ -153,17 +153,24 @@ int main(int argc, char **argv) {
     root->pretty_print(std::cerr);
 #endif
 
-    auto transformer = [](const auto &dir) {
+    constexpr int total_space = 70000000;
+    constexpr int required_space = 30000000;
+    const int min_to_delete = required_space - (total_space - root->size);
+
+    int part_1_total = 0;
+    int part_2_min = root->size;
+    for (const auto &dir : all_dirs) {
         int size = dir->size;
-        // we only want the directories with
-        // a total size of at most 100,000
-        if (size > 100000) {
-            size = 0;
+        // for part 1, we only want the directories with a total size of at most
+        // 100,000
+        if (size <= 100000) {
+            part_1_total += size;
         }
-        return size;
-    };
-    int part_1 = std::transform_reduce(all_dirs.cbegin(), all_dirs.cend(), 0,
-                                       std::plus{}, transformer);
-    std::cout << part_1 << std::endl;
+        if (size >= min_to_delete && size < part_2_min) {
+            part_2_min = size;
+        }
+    }
+    std::cout << part_1_total << std::endl;
+    std::cout << part_2_min << std::endl;
     return EXIT_SUCCESS;
 }
