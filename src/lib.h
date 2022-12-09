@@ -9,16 +9,17 @@
 #ifndef LIB_H_AT4RFPRV
 #define LIB_H_AT4RFPRV
 
-#include <cassert>
-#include <fstream>
-#include <iostream>
+#include <cassert>  // for assert
+#include <cstdlib>  // for exit
+#include <fstream>  // for ifstream
+#include <iostream> // for cout
 
 namespace aoc {
 
 #ifdef DEBUG_MODE
 [[maybe_unused]] constexpr bool DEBUG = true;
 #else
-constexpr bool DEBUG = false;
+[[maybe_unused]] constexpr bool DEBUG = false;
 #endif
 
 /**
@@ -29,7 +30,7 @@ std::ifstream parse_args(int argc, char **argv) {
     if (argc != 2) {
         assert(argc >= 1);
         std::cout << "Usage: " << argv[0] << " <input file path>" << std::endl;
-        exit(EXIT_FAILURE);
+        std::exit(1);
     }
     return std::ifstream{argv[1]};
 }

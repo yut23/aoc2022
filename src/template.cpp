@@ -14,7 +14,7 @@ namespace aoc::day{{DAY}} {
 } // namespace aoc::day{{DAY}}
 
 int main(int argc, char **argv) {
-    auto infile = aoc::parse_args(argc, argv);
+    std::ifstream infile = aoc::parse_args(argc, argv);
 
     // read file line-by-line
     std::string line;
