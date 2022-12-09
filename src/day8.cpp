@@ -13,6 +13,7 @@
 #include <iostream>   // for cout
 #include <numeric>    // for transform_reduce
 #include <string>     // for string, getline
+#include <tuple>      // for tuple
 #include <vector>     // for vector
 
 namespace aoc::day8 {
@@ -40,6 +41,7 @@ class Forest {
     // mark the trees that are visible from any direction
     void mark_visible();
     int count_visible() const;
+    int calc_scenic_score(int r, int c) const;
 };
 
 void Forest::add_row(const std::string &line) {
@@ -88,6 +90,29 @@ int Forest::count_visible() const {
         });
 }
 
+int Forest::calc_scenic_score(int row, int col) const {
+    int height = trees[row][col].height;
+    int score = 1;
+    // loop over the 4 cardinal directions and increment or decrement the row or
+    // column index
+    std::vector<std::tuple<int, int>> directions{
+        {1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    for (auto [dr, dc] : directions) {
+        // the number of trees we can see in each direction
+        int distance = 0;
+        for (int r = row + dr, c = col + dc;
+             r >= 0 && r < size() && c >= 0 && c < size(); r += dr, c += dc) {
+            ++distance;
+            if (trees[r][c].height >= height) {
+                break;
+            }
+        }
+        // score is the product of the distance in each of the 4 directions
+        score *= distance;
+    }
+    return score;
+}
+
 } // namespace aoc::day8
 
 int main(int argc, char **argv) {
@@ -104,5 +129,15 @@ int main(int argc, char **argv) {
     }
     forest.mark_visible();
     std::cout << forest.count_visible() << std::endl;
+    int max_scenic_score = 0;
+    for (int r = 1; r < forest.size() - 1; ++r) {
+        for (int c = 1; c < forest.size() - 1; ++c) {
+            int score = forest.calc_scenic_score(r, c);
+            if (score > max_scenic_score) {
+                max_scenic_score = score;
+            }
+        }
+    }
+    std::cout << max_scenic_score << std::endl;
     return 0;
 }
