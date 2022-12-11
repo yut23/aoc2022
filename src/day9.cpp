@@ -109,7 +109,8 @@ void move_tail(const Pos &head, Pos &tail) {
     assert((head - tail).chebyshev_distance() == 1);
 }
 
-template <typename T> void move_rope(const Delta &delta, T &rope) {
+template <typename T>
+void move_rope(const Delta &delta, T &rope) {
     *std::begin(rope) += delta;
     auto first = std::cbegin(rope);
     auto second = std::begin(rope) + 1;

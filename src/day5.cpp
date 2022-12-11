@@ -13,9 +13,11 @@
 
 namespace aoc::day5 {
 
-template <class T> using Stacks = std::vector<std::list<T>>;
+template <class T>
+using Stacks = std::vector<std::list<T>>;
 
-template <class T> void move(Stacks<T> &stacks, int src, int dst) {
+template <class T>
+void move(Stacks<T> &stacks, int src, int dst) {
     stacks[dst].push_back(stacks[src].back());
     stacks[src].pop_back();
 }
