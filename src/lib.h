@@ -22,6 +22,22 @@ namespace aoc {
 [[maybe_unused]] constexpr bool DEBUG = false;
 #endif
 
+template <class T>
+struct SkipInputHelper {
+    int count;
+    friend std::istream &operator>>(std::istream &is, SkipInputHelper<T> s) {
+        T temp;
+        for (int i = 0; i < s.count && (is >> temp); ++i)
+            ;
+        return is;
+    }
+};
+
+template <class T = std::string>
+SkipInputHelper<T> skip(int count = 1) {
+    return SkipInputHelper<T>{count};
+}
+
 /**
  * @brief  Parse command line arguments.
  * @return An istream for the specified input file.
