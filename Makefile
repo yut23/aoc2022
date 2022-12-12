@@ -16,10 +16,10 @@ CPP = $(wildcard src/day*.cpp)
 REL_OBJ = $(CPP:src/%.cpp=$(REL_BUILD_DIR)/%.o)
 DEBUG_OBJ = $(CPP:src/%.cpp=$(DEBUG_BUILD_DIR)/%.o)
 # gcc/clang will create these .d files containing dependencies.
-DEP = $(REL_OBJ:%.o=%.d) $(DEBUG_OBJ:%.o=%.d)
+DEP = $(REL_OBJ:.o=.d) $(DEBUG_OBJ:.o=.d)
 
-REL_EXECUTABLES := $(CPP:src/%.cpp=$(REL_BUILD_DIR)/%)
-DEBUG_EXECUTABLES := $(CPP:src/%.cpp=$(DEBUG_BUILD_DIR)/%)
+REL_EXECUTABLES := $(REL_OBJ:.o=)
+DEBUG_EXECUTABLES := $(DEBUG_OBJ:.o=)
 all: compile_commands.json $(REL_EXECUTABLES) #$(DEBUG_EXECUTABLES)
 debug: $(DEBUG_EXECUTABLES)
 
@@ -51,9 +51,7 @@ $(DEBUG_BUILD_DIR)/%.o: src/%.cpp | $(DEBUG_BUILD_DIR)
 	bear --append $(BEAR_ARGS) -- $(CXX) $(DEBUG_CXXFLAGS) $(CXXFLAGS) -MMD -c $< -o $@
 
 # Link the object files into executables
-$(REL_BUILD_DIR)/day%: $(REL_BUILD_DIR)/day%.o
-	$(CXX) $^ -o $@ $(LDFLAGS)
-$(DEBUG_BUILD_DIR)/day%: $(DEBUG_BUILD_DIR)/day%.o
+$(REL_EXECUTABLES) $(DEBUG_EXECUTABLES): %: %.o
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 clean:
