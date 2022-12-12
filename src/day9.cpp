@@ -5,93 +5,21 @@
  * Created:     2022-12-09
  *****************************************************************************/
 
-#include "lib.h"
-#include <algorithm> // for max
-#include <array>     // for array
-#include <cassert>   // for assert
-#include <compare>   // for strong_ordering
-#include <cstdlib>   // for abs
-#include <iostream>  // for cout, cerr
-#include <iterator>  // for begin, end, cbegin
-#include <set>       // for set
-#include <string>    // for string
-#include <vector>    // for vector
+#include "lib.h"    // for Pos, Delta, Direction
+#include <array>    // for array
+#include <cassert>  // for assert
+#include <cstdlib>  // for abs
+#include <iostream> // for cout, cerr
+#include <iterator> // for begin, end, cbegin
+#include <set>      // for set
+#include <string>   // for string
+#include <vector>   // for vector
 
 namespace aoc::day9 {
 
-enum Direction : char { up = 'U', down = 'D', left = 'L', right = 'R' };
-std::istream &operator>>(std::istream &is, enum Direction &dir) {
-    char ch = 0;
-    if (is >> ch) {
-        dir = static_cast<Direction>(ch);
-    }
-    return is;
-}
-
-struct Delta {
-    int dx;
-    int dy;
-
-    Delta(int dx, int dy) : dx(dx), dy(dy) {}
-    explicit Delta(Direction dir);
-
-    int chebyshev_distance() const {
-        return std::max(std::abs(dx), std::abs(dy));
-    }
-};
-
-Delta::Delta(Direction dir) : dx(0), dy(0) {
-    switch (dir) {
-    case Direction::up:
-        dy = 1;
-        break;
-    case Direction::down:
-        dy = -1;
-        break;
-    case Direction::right:
-        dx = 1;
-        break;
-    case Direction::left:
-        dx = -1;
-        break;
-    }
-}
-
-std::ostream &operator<<(std::ostream &os, const Delta &delta) {
-    os << "Delta(" << delta.dx << ", " << delta.dy << ")";
-    return os;
-}
-
-struct Pos {
-    int x;
-    int y;
-
-    Pos() : x(0), y(0) {}
-    Pos(int x, int y) : x(x), y(y) {}
-
-    // we can add a Delta to a Pos, but not another Pos
-    Pos &operator+=(const Delta &rhs) {
-        x += rhs.dx;
-        y += rhs.dy;
-        return *this;
-    }
-
-    std::strong_ordering operator<=>(const Pos &) const = default;
-};
-// this takes lhs by copy, so it doesn't modify the original lhs
-inline Pos operator+(Pos lhs, const Delta &rhs) {
-    lhs += rhs;
-    return lhs;
-}
-// can subtract two Pos, yielding a Delta
-inline Delta operator-(const Pos &lhs, const Pos &rhs) {
-    return {lhs.x - rhs.x, lhs.y - rhs.y};
-}
-
-std::ostream &operator<<(std::ostream &os, const Pos &pos) {
-    os << "Pos(" << pos.x << ", " << pos.y << ")";
-    return os;
-}
+using Pos = aoc::Pos;
+using Delta = aoc::Delta;
+using Direction = aoc::Direction;
 
 void move_tail(const Pos &head, Pos &tail) {
     Delta delta = head - tail;
