@@ -11,13 +11,13 @@ source ./lib.sh
 
 input_name=input.txt
 day=$(date +%-d)
-debug=n
+bin_dir=build/release
 
 first_iter=y
 while [[ $# -gt 0 ]]; do
   case $1 in
     -d|--debug)
-      debug=y
+      bin_dir=build/debug
       shift
       ;;
     -e|--example)
@@ -57,10 +57,7 @@ while [[ $# -gt 0 ]]; do
   first_iter=n
 done
 
-binary=bin/day$day
-if [[ $debug == y ]]; then
-  binary=$binary.debug
-fi
+binary=$bin_dir/day$day
 
 # rebuild if make says it's necessary
 make_quiet "$binary"

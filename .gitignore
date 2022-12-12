@@ -1,4 +1,3 @@
 .aoc_session
-bin/
-debug/
+build/
 !.autoenv.zsh

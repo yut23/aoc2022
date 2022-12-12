@@ -23,7 +23,7 @@ to_edit+=("$source_file" src/lib.h)
 # update the entire compilation database if needed
 make_quiet compile_commands.json || true
 # build this day's binaries so the compilation database gets updated
-make_quiet "bin/day$day" || true
-make_quiet "bin/day$day.debug" || true
+make_quiet "build/release/day$day" || true
+make_quiet "build/debug/day$day" || true
 
 NVIM_GUI=1 nvim-qt -- -O "${to_edit[@]}"
