@@ -91,10 +91,11 @@ struct NodeData {
     explicit NodeData(int height) : height(height) {}
 };
 
-void bfs(LinkedGrid<NodeData>::node_pointer &start) {
-    std::queue<LinkedGrid<NodeData>::node_pointer> queue{{start}};
-    (*start)->distance = 0;
+int bfs(LinkedGrid<NodeData>::node_pointer &end) {
+    std::queue<LinkedGrid<NodeData>::node_pointer> queue{{end}};
+    (*end)->distance = 0;
     int curr_distance = -1;
+    int closest_a = std::numeric_limits<int>::max();
     while (!queue.empty()) {
         LinkedGrid<NodeData>::Node &node = *queue.front();
         queue.pop();
@@ -102,6 +103,9 @@ void bfs(LinkedGrid<NodeData>::node_pointer &start) {
             continue;
         }
         node->visited = true;
+        if (node->height == 0 && node->distance < closest_a) {
+            closest_a = node->distance;
+        }
         if (node->distance > curr_distance) {
             curr_distance = node->distance;
             if constexpr (aoc::DEBUG) {
@@ -113,9 +117,9 @@ void bfs(LinkedGrid<NodeData>::node_pointer &start) {
         for (auto weak_neighbor :
              {node.north, node.east, node.south, node.west}) {
             if (auto neighbor_ptr = weak_neighbor.lock()) {
-                auto &neighbor = *neighbor_ptr;
+                LinkedGrid<NodeData>::Node &neighbor = *neighbor_ptr;
                 // neighbor exists
-                if (neighbor->height > node->height + 1) {
+                if (node->height > neighbor->height + 1) {
                     // too steep
                     continue;
                 }
@@ -123,13 +127,14 @@ void bfs(LinkedGrid<NodeData>::node_pointer &start) {
                     // already visited
                     continue;
                 }
-                // update the neighbor's distance from the start and add it to
+                // update the neighbor's distance from the end and add it to
                 // the queue
                 neighbor->distance = node->distance + 1;
                 queue.push(neighbor_ptr);
             }
         }
     }
+    return closest_a;
 }
 
 } // namespace aoc::day12
@@ -166,9 +171,12 @@ int main(int argc, char **argv) {
         }
         curr_pos += aoc::Delta(aoc::Direction::right);
     }
-    // perform a simple BFS over the grid from `start`
-    bfs(start);
+    // perform a BFS over the grid starting from `end`
+    // at the same time, find the lowest distance among nodes with height == 0
+    int closest_a = bfs(end);
 
-    std::cout << (*end)->distance << std::endl;
+    std::cout << (*start)->distance << std::endl;
+    std::cout << closest_a << std::endl;
+
     return 0;
 }
