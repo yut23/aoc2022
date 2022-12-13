@@ -26,7 +26,7 @@ namespace aoc {
 [[maybe_unused]] constexpr bool DEBUG = false;
 #endif
 
-enum Direction : char { up = 'U', down = 'D', left = 'L', right = 'R' };
+enum class Direction : char { up = 'U', down = 'D', left = 'L', right = 'R' };
 std::istream &operator>>(std::istream &is, Direction &dir) {
     char ch = 0;
     if (is >> ch) {
@@ -40,28 +40,49 @@ struct Delta {
     int dy;
 
     constexpr Delta(int dx, int dy) : dx(dx), dy(dy) {}
-    explicit constexpr Delta(Direction dir);
+    explicit constexpr Delta(Direction dir) : dx(0), dy(0) {
+        switch (dir) {
+        case Direction::up:
+            dy = 1;
+            break;
+        case Direction::down:
+            dy = -1;
+            break;
+        case Direction::right:
+            dx = 1;
+            break;
+        case Direction::left:
+            dx = -1;
+            break;
+        }
+    }
 
     constexpr int chebyshev_distance() const {
         return std::max(std::abs(dx), std::abs(dy));
     }
-};
 
-constexpr Delta::Delta(Direction dir) : dx(0), dy(0) {
-    switch (dir) {
-    case Direction::up:
-        dy = 1;
-        break;
-    case Direction::down:
-        dy = -1;
-        break;
-    case Direction::right:
-        dx = 1;
-        break;
-    case Direction::left:
-        dx = -1;
-        break;
+    // two Deltas can be added together
+    Delta &operator+=(const Delta &rhs) {
+        dx += rhs.dx;
+        dy += rhs.dy;
+        return *this;
     }
+
+    // two Deltas can be subtracted
+    Delta &operator-=(const Delta &rhs) {
+        dx -= rhs.dx;
+        dy -= rhs.dy;
+        return *this;
+    }
+};
+// this takes lhs by copy, so it doesn't modify the original lhs
+inline Delta operator+(Delta lhs, const Delta &rhs) {
+    lhs += rhs;
+    return lhs;
+}
+inline Delta operator-(Delta lhs, const Delta &rhs) {
+    lhs -= rhs;
+    return lhs;
 }
 
 std::ostream &operator<<(std::ostream &os, const Delta &delta) {
