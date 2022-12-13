@@ -8,6 +8,7 @@
 #include "lib.h"
 #include <algorithm>  // for ranges::transform, ranges::sort
 #include <cassert>    // for assert
+#include <cstddef>    // for size_t
 #include <deque>      // for deque
 #include <functional> // for function, greater
 #include <iostream>   // for cout, cerr
@@ -151,7 +152,7 @@ std::istream &operator>>(std::istream &is, Monkey &m) {
 }
 
 std::ostream &operator<<(std::ostream &os, const std::vector<Monkey> &monkeys) {
-    for (int i = 0; i < monkeys.size(); ++i) {
+    for (std::size_t i = 0; i < monkeys.size(); ++i) {
         os << "Monkey " << i << ": ";
         const Monkey &monkey = monkeys[i];
         for (auto item_it = monkey.items.cbegin();
@@ -170,7 +171,7 @@ template <bool part_1>
 item_t do_monkey_business(std::vector<Monkey> monkeys, int num_rounds,
                           item_t modulus = 0) {
     for (int round = 1; round <= num_rounds; ++round) {
-        for (int i = 0; i < monkeys.size(); ++i) {
+        for (std::size_t i = 0; i < monkeys.size(); ++i) {
             if constexpr (verbose && part_1) {
                 std::cerr << "Monkey " << i << ":" << std::endl;
             }
@@ -186,7 +187,7 @@ item_t do_monkey_business(std::vector<Monkey> monkeys, int num_rounds,
         if constexpr (aoc::DEBUG) {
             if (round == 1 || round == 20 || round % 1000 == 0) {
                 std::cerr << "== After round " << round << " ==" << std::endl;
-                for (int i = 0; i < monkeys.size(); ++i) {
+                for (std::size_t i = 0; i < monkeys.size(); ++i) {
                     std::cerr << "Monkey " << i << " inspected items "
                               << monkeys[i].inspect_count << " times."
                               << std::endl;

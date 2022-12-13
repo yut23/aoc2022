@@ -64,7 +64,8 @@ void Forest::update_visibility(int row, int col, int &tallest) {
 
 void Forest::mark_visible() {
     assert(size() > 0);
-    assert(size() == trees.size() && size() == trees[0].size());
+    assert(size() == static_cast<int>(trees.size()) &&
+           size() == static_cast<int>(trees[0].size()));
     for (int i = 0; i < size(); ++i) {
         int tallest_row = -1, tallest_col = -1;
         for (int j = 0; j < size(); ++j) {

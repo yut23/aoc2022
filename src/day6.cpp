@@ -7,6 +7,7 @@
 
 #include "lib.h"
 #include <cassert>       // for assert
+#include <cstddef>       // for size_t, ptrdiff_t
 #include <iostream>      // for cout, cerr
 #include <iterator>      // for distance
 #include <string>        // for string, getline
@@ -16,7 +17,7 @@
 namespace aoc::day6 {
 
 /// Returns the index of the first character after the marker occurrence.
-int find_marker(std::string text, int window_size) {
+int find_marker(std::string text, std::size_t window_size) {
     assert(text.length() >= window_size);
     std::unordered_multiset<char> lookup{};
     auto old_it = text.cbegin();
@@ -47,7 +48,7 @@ int find_marker(std::string text, int window_size) {
                       << " lookup=" << std::string_view{old_it, new_it}
                       << " size=" << lookup.size() << std::endl;
         }
-        if (new_it - old_it >= window_size) {
+        if (new_it - old_it >= static_cast<std::ptrdiff_t>(window_size)) {
             ++old_it;
         }
         ++new_it;

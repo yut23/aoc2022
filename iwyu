@@ -1,4 +1,4 @@
 #!/bin/bash
 set -euo pipefail
 
-iwyu_tool.py -p . "$@" -- -Xiwyu --quoted_includes_first -Xiwyu --max_line_length=300 -Xiwyu --update_comments -resource-dir "$(clang -print-resource-dir)"
+iwyu_tool.py -p . "$@" -- --no-warnings -Xiwyu --quoted_includes_first -Xiwyu --max_line_length=300 -resource-dir "$(clang -print-resource-dir)"

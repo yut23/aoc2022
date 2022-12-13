@@ -6,6 +6,7 @@
  *****************************************************************************/
 
 #include "lib.h"
+#include <cstddef>  // for size_t
 #include <iostream> // for cout
 #include <list>     // for list
 #include <string>   // for string, getline
@@ -39,7 +40,7 @@ int main(int argc, char **argv) {
         }
         // insert new elements at the front (bottom) of the stack, since we're
         // parsing from the top down
-        for (int i = 0; i < line.length(); i += 4) {
+        for (std::size_t i = 0; i < line.length(); i += 4) {
             if (line[i] == '[') {
                 stacks[i / 4].push_front(line[i + 1]);
             }

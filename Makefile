@@ -1,7 +1,7 @@
 ifeq ($(origin CXX), default)
 	CXX = clang++
 endif
-LOCAL_CXXFLAGS = -Wall -O3 -std=c++20 -fsanitize=undefined -fsanitize=address #$(shell pkg-config --cflags $(libs_$(notdir $*)))
+LOCAL_CXXFLAGS = -Wall -Wextra -O3 -std=c++20 -fsanitize=undefined -fsanitize=address #$(shell pkg-config --cflags $(libs_$(notdir $*)))
 DEBUG_CXXFLAGS = $(LOCAL_CXXFLAGS) -g -Og -DDEBUG_MODE
 LDFLAGS = -Wl,--as-needed -fsanitize=undefined -fsanitize=address #$(shell pkg-config --libs $(libs_$(notdir $*)))
 BEAR_ARGS = --config bear_config.json
