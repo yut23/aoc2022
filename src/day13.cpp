@@ -6,11 +6,14 @@
  *****************************************************************************/
 
 #include "lib.h"
+#include <algorithm>        // for sort, upper_bound
 #include <cassert>          // for assert
 #include <compare>          // for strong_ordering
 #include <cstddef>          // for size_t
 #include <initializer_list> // for initializer_list
 #include <iostream>         // for cout
+#include <iterator>         // for distance
+#include <utility>          // for move
 #include <vector>           // for vector
 
 namespace aoc::day13 {
@@ -43,6 +46,7 @@ struct Packet {
         return _is_list || _is_int;
     }
 
+    bool operator==(const Packet &rhs) const = default;
     friend std::istream &operator>>(std::istream &, Packet &);
 };
 
@@ -99,7 +103,7 @@ std::ostream &operator<<(std::ostream &os, const Packet &packet) {
     return os;
 }
 
-std::strong_ordering operator<=>(const Packet &lhs, const Packet &rhs) {
+std::weak_ordering operator<=>(const Packet &lhs, const Packet &rhs) {
     assert(lhs.is_either() && rhs.is_either());
     if (lhs.is_int() && rhs.is_int()) {
         // both integers, compare values
@@ -109,8 +113,8 @@ std::strong_ordering operator<=>(const Packet &lhs, const Packet &rhs) {
         // both lists, compare recursively
         for (std::size_t i = 0;
              i < lhs.contents.size() && i < rhs.contents.size(); ++i) {
-            std::strong_ordering cmp = lhs.contents[i] <=> rhs.contents[i];
-            if (cmp != std::strong_ordering::equal) {
+            std::weak_ordering cmp = lhs.contents[i] <=> rhs.contents[i];
+            if (cmp != std::weak_ordering::equivalent) {
                 return cmp;
             }
         }
@@ -136,6 +140,7 @@ int main(int argc, char **argv) {
 
     using namespace aoc::day13;
     Packet left, right;
+    std::vector<Packet> packets;
     int result = 0;
     for (int i = 1; infile >> left >> right; ++i) {
         if constexpr (aoc::DEBUG) {
@@ -152,7 +157,23 @@ int main(int argc, char **argv) {
                 << i
                 << ": left >= right, so inputs are not in the right order\n\n";
         }
+        packets.push_back(std::move(left));
+        packets.push_back(std::move(right));
     }
     std::cout << result << std::endl;
+
+    // add divider packets
+    Packet divider_start({Packet({Packet(2)})});
+    Packet divider_end({Packet({Packet(6)})});
+    packets.push_back(divider_start);
+    packets.push_back(divider_end);
+
+    std::ranges::sort(packets);
+    // use upper_bound to get the index of the packet after the divider
+    int start_idx = std::distance(
+        packets.begin(), std::ranges::upper_bound(packets, divider_start));
+    int end_idx = std::distance(packets.begin(),
+                                std::ranges::upper_bound(packets, divider_end));
+    std::cout << start_idx * end_idx << std::endl;
     return 0;
 }
