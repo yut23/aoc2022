@@ -12,9 +12,8 @@
 #include <algorithm> // for max
 #include <cassert>   // for assert
 #include <compare>   // for strong_ordering
-#include <cstdlib>   // for exit
-#include <cstdlib>   // for abs
-#include <fstream>   // for ifstream
+#include <cstdlib>   // for abs, exit
+#include <fstream>   // for ifstream  // IWYU pragma: keep
 #include <iostream>  // for cout
 #include <string>    // for string
 
