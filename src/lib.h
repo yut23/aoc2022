@@ -33,6 +33,10 @@ std::istream &operator>>(std::istream &is, Direction &dir) {
     }
     return is;
 }
+std::ostream &operator<<(std::ostream &os, const Direction &dir) {
+    os << static_cast<char>(dir);
+    return os;
+}
 
 struct Delta {
     int dx;
