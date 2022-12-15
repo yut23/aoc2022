@@ -62,6 +62,9 @@ class Grid {
     // returns false if the grain falls into the abyss
     bool add_sand_grain();
 
+    // add an "infinite" floor 2 spaces below max_y
+    void setup_part_2();
+
     friend std::ostream &operator<<(std::ostream &, const Grid &);
 };
 
@@ -79,7 +82,10 @@ Grid::Grid(const std::vector<std::vector<aoc::Pos>> &scan) {
             }
         }
     }
-    cells.resize(max_y - min_y + 1,
+    // a larger grid is needed for part 2
+    max_x = std::max(INITIAL_X + (max_y + 2) + 1, max_x);
+    min_x = std::min(INITIAL_X - (max_y + 2) - 1, min_x);
+    cells.resize((max_y + 2) - min_y + 1,
                  std::vector<CellType>(max_x - min_x + 1, CellType::air));
     for (const auto &path : scan) {
         auto pos_1 = path.cbegin();
@@ -88,6 +94,11 @@ Grid::Grid(const std::vector<std::vector<aoc::Pos>> &scan) {
             add_line(pos_1->x, pos_1->y, pos_2->x, pos_2->y);
         }
     }
+}
+
+void Grid::setup_part_2() {
+    max_y += 2;
+    add_line(min_x, max_y, max_x, max_y);
 }
 
 void Grid::add_line(int x1, int y1, int x2, int y2) {
@@ -166,6 +177,9 @@ bool Grid::single_tick(int &x, int &y) const {
 
 bool Grid::add_sand_grain() {
     int x = INITIAL_X, y = INITIAL_Y;
+    if (!open(x, y)) {
+        return false;
+    }
     while (single_tick(x, y)) {
         if (over_abyss(x, y)) {
             return false;
@@ -205,6 +219,11 @@ int main(int argc, char **argv) {
             std::cerr << grid << std::endl;
         }
     }
+    std::cout << i << std::endl;
+
+    grid.setup_part_2();
+    for (; grid.add_sand_grain(); ++i)
+        ;
     std::cout << i << std::endl;
     return 0;
 }
