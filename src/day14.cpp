@@ -7,9 +7,11 @@
 
 #include "lib.h"
 #include <algorithm> // for minmax
+#include <cassert>   // for assert
 #include <iostream>  // for cout
 #include <sstream>   // for istringstream
 #include <string>    // for string, getline
+#include <utility>   // for pair
 #include <vector>    // for vector
 
 namespace aoc::day14 {
@@ -43,16 +45,22 @@ class Grid {
         return {y, x - min_x};
     }
     void add_line(int x1, int y1, int x2, int y2);
-
-  public:
-    explicit Grid(const std::vector<std::vector<aoc::Pos>> &scan);
-
     void place_sand(int x, int y);
 
     // check if the given coordinates are air
     bool open(int x, int y) const;
     // returns true if there is nothing below the given point
     bool over_abyss(int x, int y) const;
+
+    // moves a sand grain once, returns false if no move is possible
+    bool single_tick(int &x, int &y) const;
+
+  public:
+    explicit Grid(const std::vector<std::vector<aoc::Pos>> &scan);
+
+    // spawn a sand grain, move it until it settles, then add it to the grid
+    // returns false if the grain falls into the abyss
+    bool add_sand_grain();
 
     friend std::ostream &operator<<(std::ostream &, const Grid &);
 };
@@ -135,33 +143,20 @@ std::ostream &operator<<(std::ostream &os, const Grid &grid) {
     return os;
 }
 
-class SandGrain {
-    int x{INITIAL_X};
-    int y{INITIAL_Y};
-
-    // moves the sand grain once, returns false if no move is possible
-    bool single_tick(const Grid &grid);
-
-  public:
-    // moves the sand grain until it settles, and adds it to the grid
-    // returns false if the grain falls into the abyss
-    bool settle(Grid &grid);
-};
-
-bool SandGrain::single_tick(const Grid &grid) {
+bool Grid::single_tick(int &x, int &y) const {
     // try moving straight down
-    if (grid.open(x, y + 1)) {
+    if (open(x, y + 1)) {
         ++y;
         return true;
     }
     // try moving down and left
-    if (grid.open(x - 1, y + 1)) {
+    if (open(x - 1, y + 1)) {
         --x;
         ++y;
         return true;
     }
     // try moving down and right
-    if (grid.open(x + 1, y + 1)) {
+    if (open(x + 1, y + 1)) {
         ++x;
         ++y;
         return true;
@@ -169,13 +164,14 @@ bool SandGrain::single_tick(const Grid &grid) {
     return false;
 }
 
-bool SandGrain::settle(Grid &grid) {
-    while (single_tick(grid)) {
-        if (grid.over_abyss(x, y)) {
+bool Grid::add_sand_grain() {
+    int x = INITIAL_X, y = INITIAL_Y;
+    while (single_tick(x, y)) {
+        if (over_abyss(x, y)) {
             return false;
         }
     }
-    grid.place_sand(x, y);
+    place_sand(x, y);
     return true;
 }
 
@@ -204,7 +200,7 @@ int main(int argc, char **argv) {
     }
 
     int i = 0;
-    for (; SandGrain{}.settle(grid); ++i) {
+    for (; grid.add_sand_grain(); ++i) {
         if constexpr (aoc::DEBUG) {
             std::cerr << grid << std::endl;
         }
