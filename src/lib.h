@@ -64,6 +64,10 @@ struct Delta {
         return std::max(std::abs(dx), std::abs(dy));
     }
 
+    constexpr int manhattan_distance() const {
+        return std::abs(dx) + std::abs(dy);
+    }
+
     // two Deltas can be added together
     Delta &operator+=(const Delta &rhs) {
         dx += rhs.dx;
