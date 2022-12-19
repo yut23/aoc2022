@@ -21,9 +21,14 @@ fi
 to_edit+=("$source_file" src/lib.h)
 
 # update the entire compilation database if needed
-make_quiet compile_commands.json || true
+make_quiet compile_commands.json -j"$(nproc)" || true
 # build this day's binaries so the compilation database gets updated
-make_quiet "build/release/day$day" || true
-make_quiet "build/debug/day$day" || true
+make_targets=()
+shopt -s lastpipe
+make -q "build/release/day$day" 2>/dev/null || make_targets+=("build/release/day$day")
+make -q "build/debug/day$day" 2>/dev/null || make_targets+=("build/debug/day$day")
+if [[ ${#make_targets[@]} -gt 0 ]]; then
+  make -j"${#make_targets[@]}" "${make_targets[@]}" || true
+fi
 
 NVIM_GUI=1 nvim-qt -- -O "${to_edit[@]}"
