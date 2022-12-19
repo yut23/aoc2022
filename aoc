@@ -20,6 +20,10 @@ while [[ $# -gt 0 ]]; do
       bin_dir=build/debug
       shift
       ;;
+    -f|--fast)
+      bin_dir=build/fast
+      shift
+      ;;
     -e|--example)
       input_name=example1.txt
       if [[ $# -gt 1 ]]; then
