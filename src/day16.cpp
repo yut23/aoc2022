@@ -8,7 +8,6 @@
 #include "lib.h"
 #include <algorithm>     // for find_if, for_each, find
 #include <cassert>       // for assert
-#include <compare>       // for weak_ordering
 #include <iostream>      // for cout, cerr
 #include <limits>        // for numeric_limits
 #include <map>           // for map
@@ -171,34 +170,23 @@ DistanceMap floyd_warshall(const T &valves) {
     return dists;
 }
 
-class GreedySolver {
+class DFSSolver {
     const Graph &graph;
     const DistanceMap &dists;
     std::vector<Key> opened_valves{};
 
   public:
-    GreedySolver(const Graph &graph, const DistanceMap &dists)
+    DFSSolver(const Graph &graph, const DistanceMap &dists)
         : graph(graph), dists(dists) {}
 
-    int solve(const Key &current_valve, int remaining_time,
-              std::vector<Key> opened_valves = {});
+    int solve(const Key &current_valve, int remaining_time);
 };
 
-struct Move {
-    Key valve{};
-    int time_taken = 0;
-    int future_value = 0;
-
-    std::weak_ordering operator<=>(const Move &rhs) const {
-        return future_value <=> rhs.future_value;
-    }
-};
-
-int GreedySolver::solve(const Key &current_valve, int remaining_time,
-                        std::vector<Key> opened_valves) {
-    Move best_move{};
+int DFSSolver::solve(const Key &current_valve, int remaining_time) {
+    int best_total = 0;
     for (const auto &[name, valve] : graph.valves) {
-        if (std::ranges::find(opened_valves, name) != opened_valves.end()) {
+        if (std::ranges::find(opened_valves, name) != opened_valves.end() ||
+            valve->flow_rate == 0) {
             // skip valves we've already opened
             continue;
         }
@@ -208,30 +196,18 @@ int GreedySolver::solve(const Key &current_valve, int remaining_time,
         assert(distance >= 0);
         // deduct the travel time plus the minute it takes to open the valve
         int future_value = (remaining_time - (distance + 1)) * valve->flow_rate;
-        if (future_value > 0 && future_value > best_move.future_value) {
-            best_move.valve = name;
-            best_move.time_taken = distance + 1;
-            best_move.future_value = future_value;
+        if (future_value <= 0) {
+            continue;
+        }
+        // recurse from the current state
+        opened_valves.push_back(name);
+        int total = future_value + solve(name, remaining_time - (distance + 1));
+        opened_valves.pop_back();
+        if (total > best_total) {
+            best_total = total;
         }
     }
-    if (best_move.future_value == 0) {
-        // base case
-        return 0;
-    }
-
-    // make move
-    if constexpr (aoc::DEBUG) {
-        std::cerr << "moving " << best_move.time_taken - 1 << " spaces to "
-                  << best_move.valve << " and opening it at minute "
-                  << (30 - remaining_time) + best_move.time_taken
-                  << ", to release " << best_move.future_value
-                  << " total pressure at a flow rate of "
-                  << graph.valves.at(best_move.valve)->flow_rate << "\n";
-    }
-    opened_valves.push_back(best_move.valve);
-    return best_move.future_value + solve(best_move.valve,
-                                          remaining_time - best_move.time_taken,
-                                          opened_valves);
+    return best_total;
 }
 
 } // namespace aoc::day16
@@ -250,10 +226,7 @@ int main(int argc, char **argv) {
     // graph.output_graphviz(std::cout);
 
     auto dists = floyd_warshall(graph.valves);
-    GreedySolver solver{graph, dists};
-    if constexpr (aoc::DEBUG) {
-        std::cerr << "starting at AA\n";
-    }
+    DFSSolver solver{graph, dists};
     int part_1 = solver.solve("AA", 30);
     std::cout << part_1 << std::endl;
     return 0;
