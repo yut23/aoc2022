@@ -13,7 +13,7 @@
 #include <map>       // for map
 #include <memory>    // for unique_ptr, make_unique
 #include <regex>     // for regex, smatch, regex_search, sregex_iterator
-#include <string>    // for string, getline
+#include <string>    // for string, getline, stoi
 #include <vector>    // for vector
 
 namespace aoc::day16 {
@@ -181,18 +181,36 @@ class DFSSolver {
     const Graph &graph;
     const DistanceMap &dists;
 
-  public:
-    DFSSolver(const Graph &graph, const DistanceMap &dists)
-        : graph(graph), dists(dists) {}
+    Key my_pos;
+    int my_remaining_time;
+    Key elephant_pos;
+    int elephant_remaining_time;
 
-    int solve(Key current_key, int remaining_time,
-              unsigned int visited_valves = 0);
+  public:
+    DFSSolver(const Graph &graph, const DistanceMap &dists, int my_time,
+              int elephant_time = 0)
+        : graph(graph), dists(dists), my_remaining_time(my_time),
+          elephant_remaining_time(elephant_time) {
+        my_pos = elephant_pos = graph.name_lookup.at("AA");
+    }
+
+    int solve(unsigned int visited_valves = 0, int depth = 0);
 };
 
-int DFSSolver::solve(Key current_key, int remaining_time,
-                     unsigned int visited_valves) {
+int DFSSolver::solve(unsigned int visited_valves, int depth) {
+    // move the one with more remaining time
+    const bool move_me = my_remaining_time >= elephant_remaining_time;
+    Key &current_pos = move_me ? my_pos : elephant_pos;
+    int &remaining_time = move_me ? my_remaining_time : elephant_remaining_time;
+    if constexpr (aoc::DEBUG) {
+        std::cerr << std::string(depth * 2, ' ') << "moving "
+                  << (move_me ? "me" : "elephant") << " to "
+                  << graph.valves[current_pos]->name << " at time "
+                  << (30 - remaining_time) << "\n";
+    }
+    const auto &distances = dists[current_pos];
+    Key prev_pos = current_pos;
     int best_total = 0;
-    const auto &distances = dists[current_key];
     for (Key key = 0, mask = 1; key < graph.valves.size(); ++key, mask <<= 1) {
         Valve *valve = graph.valves[key].get();
         if (visited_valves & mask || valve->flow_rate == 0) {
@@ -209,10 +227,19 @@ int DFSSolver::solve(Key current_key, int remaining_time,
             continue;
         }
         // recurse from the new state
-        int total = future_value + solve(key, remaining_time - (distance + 1),
-                                         visited_valves | mask);
+        current_pos = key;
+        remaining_time -= distance + 1;
+        int total = future_value + solve(visited_valves | mask, depth + 1);
+        remaining_time += distance + 1;
+        current_pos = prev_pos;
         if (total > best_total) {
             best_total = total;
+        }
+    }
+    if constexpr (aoc::DEBUG) {
+        if (best_total > 0) {
+            std::cerr << std::string(depth * 2, ' ')
+                      << "best total pressure: " << best_total << "\n";
         }
     }
     return best_total;
@@ -234,8 +261,10 @@ int main(int argc, char **argv) {
     // graph.output_graphviz(std::cout);
 
     auto dists = floyd_warshall(graph.valves);
-    DFSSolver solver{graph, dists};
-    int part_1 = solver.solve(graph.name_lookup.at("AA"), 30);
-    std::cout << part_1 << std::endl;
+    DFSSolver solver_1{graph, dists, 30};
+    std::cout << solver_1.solve() << std::endl;
+
+    DFSSolver solver_2{graph, dists, 26, 26};
+    std::cout << solver_2.solve() << std::endl;
     return 0;
 }
