@@ -68,4 +68,5 @@ make_quiet "$binary"
 
 echo "Day $day:"
 # run on the specified input
-"$binary" "input/day$day/$input_name"
+# have ASan print a backtrace when an assertion fails (which triggers an abort)
+ASAN_OPTIONS=${ASAN_OPTIONS:+${ASAN_OPTIONS}:}handle_abort=1 "$binary" "input/day$day/$input_name"
