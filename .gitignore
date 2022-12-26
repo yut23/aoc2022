@@ -1,3 +1,4 @@
 .aoc_session
 build/
 !.autoenv.zsh
+input/*/input.txt
