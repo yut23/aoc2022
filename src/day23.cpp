@@ -50,9 +50,8 @@ struct Cell {
 
 class Grid {
   private:
-    bool initialized = false;
-    int x_lo, y_lo;
-    int x_hi, y_hi;
+    int x_lo = 0, y_lo = 0;
+    int x_hi = 0, y_hi = 0;
     std::list<MoveDirection> proposal_order = {
         MoveDirection::north,
         MoveDirection::south,
@@ -82,14 +81,10 @@ class Grid {
     bool is_move_valid(int x, int y, MoveDirection dir, Cell *&dest);
     bool propose_move(int x, int y);
 
-    // Reduce the area by removing outside edges with no elves (only removes 1
-    // from all sides). Returns true if any edges were removed.
-    bool contract();
-
     friend std::ostream &operator<<(std::ostream &, const Grid &);
 
   public:
-    void check_invariants(bool skip_cols = false) const;
+    void check_invariants() const;
     void add_line(const std::string &line);
     bool propose_moves();
     void make_moves();
@@ -103,81 +98,54 @@ inline bool Grid::is_empty(int x, int y) const {
     return !in_bounds(x, y) || !cget(x, y).is_elf;
 }
 
-void Grid::check_invariants(bool skip_cols) const {
-    if (!initialized) {
-        return;
-    }
-    // make sure the row lengths match
-    std::deque<Cell>::size_type size = grid[0].size();
-    assert(std::ranges::all_of(
-        grid, [=](const std::deque<Cell> &row) { return row.size() == size; }));
-    // make sure the number of elves is the same
-    int curr_elf_count = std::transform_reduce(
-        grid.cbegin(), grid.cend(), 0, std::plus{}, [](const auto &row) {
-            return std::ranges::count_if(
-                row, [](const auto &cell) { return cell.is_elf; });
-        });
-    if (elf_count != curr_elf_count) {
-        std::cerr << "expected elf count to be " << elf_count << ", but got "
-                  << curr_elf_count << "\n";
-        assert(elf_count == curr_elf_count);
-    }
-    // make sure there's at least one non-empty cell on the outside edges
-    auto nonempty_cell = [](const Cell &value) { return value.is_elf; };
-    // check north edge
-    assert(std::ranges::any_of(grid.front(), nonempty_cell));
-    // check south edge
-    assert(std::ranges::any_of(grid.back(), nonempty_cell));
-    if (!skip_cols) {
-        // check west edge
-        assert(std::ranges::any_of(
-            grid, [](const auto &row) { return row.front().is_elf; }));
-        // check east edge
-        assert(std::ranges::any_of(
-            grid, [](const auto &row) { return row.back().is_elf; }));
+void Grid::check_invariants() const {
+    if constexpr (!aoc::FAST) {
+        if (x_lo == x_hi || y_lo == y_hi) {
+            assert(x_lo == x_hi && y_lo == y_hi);
+            return;
+        }
+        // make sure the row lengths match
+        std::deque<Cell>::size_type size = grid[0].size();
+        assert(std::ranges::all_of(grid, [=](const std::deque<Cell> &row) {
+            return row.size() == size;
+        }));
+        // make sure the number of elves is the same
+        int curr_elf_count = std::transform_reduce(
+            grid.cbegin(), grid.cend(), 0, std::plus{}, [](const auto &row) {
+                return std::ranges::count_if(
+                    row, [](const auto &cell) { return cell.is_elf; });
+            });
+        if (elf_count != curr_elf_count) {
+            std::cerr << "expected elf count to be " << elf_count
+                      << ", but got " << curr_elf_count << "\n";
+            assert(elf_count == curr_elf_count);
+        }
     }
 }
 
-bool Grid::contract() {
-    assert(initialized);
-    bool did_remove;
-    // make sure there's at least one non-empty cell on the outside edges
+int Grid::count_empty() const {
+    // find first and last rows and columns with elves
+    int min_r = 0, max_r = y_hi - y_lo;
+    int min_c = 0, max_c = x_hi - x_lo;
     auto empty_cell = [](const Cell &value) { return !value.is_elf; };
-    if (std::ranges::all_of(grid.front(), empty_cell)) {
-        // remove north edge
-        ++y_lo;
-        grid.pop_front();
-        did_remove = true;
+    while (std::ranges::all_of(grid[min_r], empty_cell)) {
+        ++min_r;
     }
-    if (std::ranges::all_of(grid.back(), empty_cell)) {
-        // remove south edge
-        --y_hi;
-        grid.pop_back();
-        did_remove = true;
+    while (std::ranges::all_of(grid[max_r - 1], empty_cell)) {
+        --max_r;
     }
-    if (std::ranges::all_of(
-            grid, [](const auto &row) { return !row.front().is_elf; })) {
-        // remove west edge
-        ++x_lo;
-        std::ranges::for_each(grid, [](auto &row) { row.pop_front(); });
-        did_remove = true;
+    while (std::ranges::all_of(
+        grid, [&min_c](const auto &row) { return !row[min_c].is_elf; })) {
+        ++min_c;
     }
-    if (std::ranges::all_of(
-            grid, [](const auto &row) { return !row.back().is_elf; })) {
-        // remove east edge
-        --x_hi;
-        std::ranges::for_each(grid, [](auto &row) { row.pop_back(); });
-        did_remove = true;
+    while (std::ranges::all_of(
+        grid, [&max_c](const auto &row) { return !row[max_c - 1].is_elf; })) {
+        --max_c;
     }
-    return did_remove;
+    return (max_c - min_c) * (max_r - min_r) - elf_count;
 }
 
 Cell &Grid::get(int x, int y) {
-    if (!initialized) {
-        x_lo = x_hi = x;
-        y_lo = y_hi = y;
-        initialized = true;
-    }
     if (!in_bounds(x, y)) {
         if (y < y_lo) {
             add_rows(y - y_lo);
@@ -194,7 +162,6 @@ Cell &Grid::get(int x, int y) {
 }
 
 void Grid::add_rows(int signed_count) {
-    assert(initialized);
     assert(signed_count != 0);
     int count = std::abs(signed_count);
     auto dest_it = grid.cbegin();
@@ -211,7 +178,6 @@ void Grid::add_rows(int signed_count) {
 }
 
 void Grid::add_cols(int signed_count) {
-    assert(initialized);
     assert(signed_count != 0);
     int count = std::abs(signed_count);
     if (signed_count < 0) {
@@ -228,8 +194,8 @@ void Grid::add_cols(int signed_count) {
 }
 
 void Grid::add_line(const std::string &line) {
-    check_invariants(true);
-    int y = initialized ? y_hi : 0;
+    check_invariants();
+    int y = y_hi;
     for (int x = 0; char c : line) {
         if (c == '#') {
             get(x, y).is_elf = true;
@@ -270,7 +236,6 @@ bool Grid::is_move_valid(int x, int y, MoveDirection dir, Cell *&dest) {
         }
         return false;
     }
-    assert(false);
 }
 
 bool Grid::propose_move(int x, int y) {
@@ -307,12 +272,11 @@ bool Grid::propose_move(int x, int y) {
             continue;
         }
         assert(dest != nullptr);
-        if (dest->move_from != nullptr || dest->conflict) {
+        if (dest->move_from != nullptr) {
             if constexpr (aoc::DEBUG) {
                 std::cerr << "conflict\n";
             }
             dest->conflict = true;
-            dest->move_from = nullptr;
         } else {
             if constexpr (aoc::DEBUG) {
                 std::cerr << "success\n";
@@ -346,14 +310,9 @@ void Grid::make_moves() {
             dest.reset_proposal_state();
         }
     }
-    contract();
     // update proposal order: move first element to the end
     proposal_order.splice(proposal_order.cend(), proposal_order,
                           proposal_order.cbegin());
-}
-
-int Grid::count_empty() const {
-    return (x_hi - x_lo) * (y_hi - y_lo) - elf_count;
 }
 
 std::ostream &operator<<(std::ostream &os, const Grid &grid) {
@@ -382,19 +341,21 @@ int main(int argc, char **argv) {
     if constexpr (aoc::DEBUG) {
         std::cerr << "== Initial State ==\n" << grid << "\n";
     }
-    for (int round = 1; round <= 10; ++round) {
-        if (!grid.propose_moves()) {
-            if constexpr (aoc::DEBUG) {
-                std::cerr << "Done\n";
-            }
-            break;
-        }
+    int round = 0;
+    while (grid.propose_moves()) {
+        ++round;
         grid.make_moves();
         if constexpr (aoc::DEBUG) {
             std::cerr << "== End of Round " << round << " ==\n" << grid << "\n";
         }
         grid.check_invariants();
+        if (round == 10) {
+            std::cout << grid.count_empty() << "\n";
+        }
     }
-    std::cout << grid.count_empty() << std::endl;
+    if (round < 10) {
+        std::cout << grid.count_empty() << "\n";
+    }
+    std::cout << round + 1 << std::endl;
     return 0;
 }

@@ -3,7 +3,7 @@ ifeq ($(origin CXX), default)
 endif
 LOCAL_CXXFLAGS = -Wall -Wextra -O3 -std=c++20 -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer #$(shell pkg-config --cflags $(libs_$(notdir $*)))
 DEBUG_CXXFLAGS = $(LOCAL_CXXFLAGS) -g -Og -DDEBUG_MODE
-FAST_CXXFLAGS = -Wall -Wextra -O3 -std=c++20 -fno-omit-frame-pointer
+FAST_CXXFLAGS = -Wall -Wextra -O3 -std=c++20 -fno-omit-frame-pointer -DFAST_MODE
 LDFLAGS = -Wl,--as-needed -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer #$(shell pkg-config --libs $(libs_$(notdir $*)))
 FAST_LDFLAGS = -Wl,--as-needed -fno-omit-frame-pointer
 BEAR_ARGS = --config bear_config.json

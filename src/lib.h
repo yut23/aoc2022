@@ -25,6 +25,12 @@ namespace aoc {
 [[maybe_unused]] constexpr bool DEBUG = false;
 #endif
 
+#ifdef FAST_MODE
+[[maybe_unused]] constexpr bool FAST = true;
+#else
+[[maybe_unused]] constexpr bool FAST = false;
+#endif
+
 enum class Direction : char { up = 'U', down = 'D', left = 'L', right = 'R' };
 std::istream &operator>>(std::istream &is, Direction &dir) {
     char ch = 0;
