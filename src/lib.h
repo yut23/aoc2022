@@ -49,7 +49,8 @@ struct Delta {
     int dy;
 
     constexpr Delta(int dx, int dy) : dx(dx), dy(dy) {}
-    explicit constexpr Delta(Direction dir) : dx(0), dy(0) {
+    explicit constexpr Delta(Direction dir, bool invert_vertical = false)
+        : dx(0), dy(0) {
         switch (dir) {
         case Direction::up:
             dy = 1;
@@ -63,6 +64,9 @@ struct Delta {
         case Direction::left:
             dx = -1;
             break;
+        }
+        if (invert_vertical) {
+            dy *= -1;
         }
     }
 

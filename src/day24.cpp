@@ -141,9 +141,7 @@ int Valley::bfs(const Pos &src, const Pos &dest) {
         for (const auto &pos : curr_positions) {
             for (const Direction &dir : {Direction::up, Direction::down,
                                          Direction::left, Direction::right}) {
-                Delta delta{dir};
-                delta.dy *= -1;
-                Pos candidate = pos + delta;
+                Pos candidate = pos + Delta(dir, true);
                 if (candidate == dest) {
                     advance_time();
                     return time;
