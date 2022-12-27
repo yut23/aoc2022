@@ -6,17 +6,17 @@
  *****************************************************************************/
 
 #include "lib.h"
+#include <cassert>  // for assert
+#include <cstdint>  // for uint8_t
 #include <iomanip>  // for quoted
-#include <iostream> // for cout
-#include <memory>   // for shared_ptr, make_shared, enable_shared_from_this
-#include <queue>    // for queue
+#include <iostream> // for cout, cerr
 #include <set>      // for set
 #include <string>   // for string, getline
-#include <utility>  // for pair
 #include <vector>   // for vector
 
 namespace aoc::day24 {
 using Pos = aoc::Pos;
+using Delta = aoc::Delta;
 using Direction = aoc::Direction;
 
 struct Blizzard {
