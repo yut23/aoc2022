@@ -47,8 +47,12 @@ struct Blizzard {
 };
 
 class Valley {
-    int width;
-    int height;
+  public:
+    const int width;
+    const int height;
+    const Pos entrance, exit;
+
+  private:
     std::vector<Blizzard> blizzards{};
 
     int time;
@@ -63,14 +67,13 @@ class Valley {
 
   public:
     explicit Valley(const std::vector<std::string> &lines);
-
-    int bfs();
+    int bfs(const Pos &src, const Pos &dest);
 };
 
-Valley::Valley(const std::vector<std::string> &lines) : blizzards() {
-    // subtract 2 for the walls
-    width = lines[0].size() - 2;
-    height = lines.size() - 2;
+Valley::Valley(const std::vector<std::string> &lines)
+    : width(lines[0].size() - 2), height(lines.size() - 2), entrance(0, -1),
+      exit(width - 1, height) {
+    // subtract 2 from width and height for the walls
 
     blizzard_counts = std::vector<std::vector<std::uint8_t>>(
         width, std::vector<std::uint8_t>(height, 0));
@@ -130,24 +133,21 @@ void Valley::advance_time() {
     ++time;
 }
 
-int Valley::bfs() {
-    const Pos dest{width - 1, height - 1};
-    const Pos entrance{0, -1};
-    std::set<Pos> curr_positions{{entrance}};
+int Valley::bfs(const Pos &src, const Pos &dest) {
+    std::set<Pos> curr_positions{{src}};
     std::set<Pos> next_positions{};
 
     while (true) {
         for (const auto &pos : curr_positions) {
-            // reached the position just above the exit, which should always be
-            // open
-            if (pos == dest) {
-                return time + 1;
-            }
             for (const Direction &dir : {Direction::up, Direction::down,
                                          Direction::left, Direction::right}) {
                 Delta delta{dir};
                 delta.dy *= -1;
                 Pos candidate = pos + delta;
+                if (candidate == dest) {
+                    advance_time();
+                    return time;
+                }
                 if (!in_bounds(candidate)) {
                     // out-of-bounds
                     continue;
@@ -158,7 +158,7 @@ int Valley::bfs() {
                 }
                 next_positions.emplace(candidate);
             }
-            if (pos == entrance ||
+            if (pos == src ||
                 (in_bounds(pos) && blizzard_counts[pos.x][pos.y] == 0)) {
                 next_positions.emplace(pos);
             }
@@ -185,7 +185,11 @@ int main(int argc, char **argv) {
     }
     Valley valley{lines};
 
-    int min_time = valley.bfs();
-    std::cout << min_time << std::endl;
+    // part 1
+    std::cout << valley.bfs(valley.entrance, valley.exit) << "\n";
+    // go back for the snacks
+    valley.bfs(valley.exit, valley.entrance);
+    // return to the exit again
+    std::cout << valley.bfs(valley.entrance, valley.exit) << "\n";
     return 0;
 }
