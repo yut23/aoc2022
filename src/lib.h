@@ -121,11 +121,31 @@ struct Pos {
         return *this;
     }
 
+    // can scale by an integer
+    Pos &operator*=(int rhs) {
+        x *= rhs;
+        y *= rhs;
+        return *this;
+    }
+    Pos &operator/=(int rhs) {
+        x /= rhs;
+        y /= rhs;
+        return *this;
+    }
+
     constexpr std::strong_ordering operator<=>(const Pos &) const = default;
 };
 // this takes lhs by copy, so it doesn't modify the original lhs
 inline Pos operator+(Pos lhs, const Delta &rhs) {
     lhs += rhs;
+    return lhs;
+}
+inline Pos operator*(Pos lhs, int rhs) {
+    lhs *= rhs;
+    return lhs;
+}
+inline Pos operator/(Pos lhs, int rhs) {
+    lhs /= rhs;
     return lhs;
 }
 // can subtract two Pos, yielding a Delta
