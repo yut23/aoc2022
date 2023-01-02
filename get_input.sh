@@ -14,7 +14,13 @@ filename="$dest_dir/input.txt"
 if ! [[ -e "$filename" ]]; then
   # download the input
   session=$(<.aoc_session)
-  curl "https://adventofcode.com/$year/day/$day/input" --cookie "session=$session" -o "$filename"
+  url="https://adventofcode.com/$year/day/$day/input"
+  exit_code=0
+  curl --fail "$url" --cookie "session=$session" -o "$filename" || exit_code=$?
+  if [[ $exit_code -ne 0 ]]; then
+    >&2 echo "Failed to download $url"
+    exit $exit_code
+  fi
 else
   >&2 echo "Input for day $day already downloaded."
   exit 1

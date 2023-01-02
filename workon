@@ -7,7 +7,17 @@ source ./lib.sh
 
 day=${1:-$(date +%-d)}
 if ! [[ -e input/day$day/input.txt ]]; then
-  bash get_input.sh "$day"
+  args=("$day")
+  if [[ $# -gt 1 ]]; then
+    args+=("$2")
+  elif [[ $(basename "$PWD") =~ [0-9]{4} ]]; then
+    # get year from directory name
+    args+=("${BASH_REMATCH[0]}")
+  else
+    >&2 echo "Need to download input and unable to get year (is it in the directory name?)"
+    exit 1
+  fi
+  bash get_input.sh "${args[@]}"
 fi
 
 declare -a to_edit
