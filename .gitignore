@@ -2,3 +2,6 @@
 build/
 !.autoenv.zsh
 input/*/input.txt
+profiling/
+perf.data
+perf.data.old
