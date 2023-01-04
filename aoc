@@ -61,12 +61,20 @@ while [[ $# -gt 0 ]]; do
   first_iter=n
 done
 
+input_path="input/day$day/$input_name"
+if ! [[ -e "$input_path" ]]; then
+  >&2 echo "ERROR: could not find input file at $input_path"
+  exit 2
+fi
+
 binary=$bin_dir/day$day
 
 # rebuild if make says it's necessary
 make_quiet "$binary"
 
 echo "Day $day:"
+# limit memory usage to 4 GB
+ulimit -m $((4*1000*1000))
 # run on the specified input
 # have ASan print a backtrace when an assertion fails (which triggers an abort)
 ASAN_OPTIONS=${ASAN_OPTIONS:+${ASAN_OPTIONS}:}handle_abort=1 "$binary" "input/day$day/$input_name"
