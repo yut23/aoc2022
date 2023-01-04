@@ -124,11 +124,11 @@ std::weak_ordering operator<=>(const Packet &lhs, const Packet &rhs) {
     }
     if (lhs.is_int() && rhs.is_list()) {
         // convert lhs to a list
-        return Packet{{lhs}} <=> rhs;
+        return Packet({lhs}) <=> rhs;
     }
     if (lhs.is_list() && rhs.is_int()) {
         // convert rhs to a list
-        return lhs <=> Packet{{rhs}};
+        return lhs <=> Packet({rhs});
     }
     assert(false);
 }
