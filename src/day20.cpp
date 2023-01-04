@@ -51,14 +51,17 @@ void CircularLinkedNode<T>::unlink() {
 }
 
 template <typename T>
-void advance(CircularLinkedNode<T> *&ptr, long count = 1) {
-    for (long i = 0; i < std::abs(count); ++i) {
-        if (count > 0) {
+CircularLinkedNode<T> *advance(CircularLinkedNode<T> *ptr, long count = 1) {
+    if (count > 0) {
+        for (long i = 0; i < std::abs(count); ++i) {
             ptr = ptr->next;
-        } else {
+        }
+    } else {
+        for (long i = 0; i < std::abs(count); ++i) {
             ptr = ptr->prev;
         }
     }
+    return ptr;
 }
 
 template <typename T>
@@ -137,7 +140,7 @@ void CircularLinkedList<T>::mix() {
         if constexpr (aoc::DEBUG) {
             std::cerr << "advancing by " << shift << "\n";
         }
-        advance(ptr, shift);
+        ptr = advance(ptr, shift);
         if (ptr->next == head && node->data > 0) {
             head = node.get();
             if constexpr (aoc::DEBUG) {
@@ -161,7 +164,7 @@ T CircularLinkedList<T>::calc_sum() const {
     T sum = 0;
     for (int i = 1; i <= 3; ++i) {
         Node *ptr = zero;
-        advance(ptr, (i * 1000) % size());
+        ptr = advance(ptr, (i * 1000) % size());
         if constexpr (aoc::DEBUG) {
             std::cerr << i * 1000 << "th number: " << ptr->data << "\n";
         }
