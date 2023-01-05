@@ -9,13 +9,14 @@
 #ifndef LIB_H_AT4RFPRV
 #define LIB_H_AT4RFPRV
 
-#include <algorithm> // for max
-#include <cassert>   // for assert
-#include <compare>   // for strong_ordering
-#include <cstdlib>   // for abs, exit
-#include <fstream>   // for ifstream  // IWYU pragma: keep
-#include <iostream>  // for cout
-#include <string>    // for string
+#include <algorithm>   // for max
+#include <cassert>     // for assert
+#include <compare>     // for strong_ordering
+#include <cstdlib>     // for abs, exit
+#include <fstream>     // for ifstream  // IWYU pragma: keep
+#include <iostream>    // for cout
+#include <string>      // for string
+#include <type_traits> // for is_same_v, is_signed_v, conditional_t
 
 namespace aoc {
 
@@ -176,6 +177,31 @@ template <typename T = std::string>
 SkipInputHelper<T> skip(int count = 1) {
     return SkipInputHelper<T>{count};
 }
+
+// I/O manipulator that reads an 8-bit number into a char instead of a single
+// ASCII character.
+template <typename T>
+class as_number {
+    T &dest;
+    friend std::istream &operator>>(std::istream &is, as_number h) {
+        constexpr bool is_char =
+            std::is_same_v<T, char> || std::is_same_v<T, unsigned char>;
+        if constexpr (is_char) {
+            using int_type =
+                std::conditional_t<std::is_signed_v<T>, short, unsigned short>;
+            int_type temp;
+            is >> temp;
+            // cppcheck-suppress unreadVariable
+            h.dest = static_cast<T>(temp);
+        } else {
+            is >> h.dest;
+        }
+        return is;
+    }
+
+  public:
+    explicit as_number(T &dest) : dest(dest) {}
+};
 
 /**
  * @brief  Parse command line arguments.
