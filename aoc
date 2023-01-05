@@ -13,6 +13,7 @@ input_name=input.txt
 day=$(date +%-d)
 bin_dir=build/release
 use_time=n
+memory_limit=4G
 
 first_iter=y
 while [[ $# -gt 0 ]]; do
@@ -27,6 +28,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     -t|--time)
       use_time=y
+      shift
+      ;;
+    -m|--memory-limit)
+      memory_limit=$2
+      shift
       shift
       ;;
     -e|--example)
@@ -83,8 +89,25 @@ if [[ $use_time == y ]]; then
   args+=(/usr/bin/time)
 fi
 args+=("$binary" "$input_path")
-# limit memory usage to 4 GB
-ulimit -m $((4*1000*1000))
+
 # run on the specified input
-# have ASan print a backtrace when an assertion fails (which triggers an abort)
-ASAN_OPTIONS=${ASAN_OPTIONS:+${ASAN_OPTIONS}:}handle_abort=1 "${args[@]}"
+if [[ $memory_limit = none ]]; then
+  # have ASan print a backtrace when an assertion fails (which triggers an abort)
+  ASAN_OPTIONS=${ASAN_OPTIONS:+${ASAN_OPTIONS}:}handle_abort=1 "${args[@]}"
+  exit_code=$?
+else
+  # limit memory usage using a systemd transient unit
+  systemctl --quiet --user is-failed aoc.service && systemctl --user reset-failed aoc.service
+  set +e
+  systemd-run --unit=aoc.service --quiet --user --pipe --wait --pty --same-dir -p MemoryMax="$memory_limit" -p MemorySwapMax=0 -E ASAN_OPTIONS=${ASAN_OPTIONS:+${ASAN_OPTIONS}:}handle_abort=1 "${args[@]}"
+  exit_code=$?
+  set -e
+  if systemctl --quiet --user is-failed aoc.service; then
+    result=$(systemctl --user show aoc | sed -ne 's/^Result=//p')
+    if [[ $result == oom-kill ]]; then
+      >&2 echo "ERROR: ran out of memory (limited to $memory_limit)"
+    fi
+    systemctl --user reset-failed aoc.service
+  fi
+fi
+exit $exit_code
