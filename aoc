@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: aoc [day] [-d] [-e [example number]|-i <input file name>]"
+  echo "Usage: aoc [day] [-t] [-d|-f] [-e [example number]|-i <input file name>]"
 }
 
 # cd to directory of this script (repository root)
@@ -12,6 +12,7 @@ source ./lib.sh
 input_name=input.txt
 day=$(date +%-d)
 bin_dir=build/release
+use_time=n
 
 first_iter=y
 while [[ $# -gt 0 ]]; do
@@ -22,6 +23,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     -f|--fast)
       bin_dir=build/fast
+      shift
+      ;;
+    -t|--time)
+      use_time=y
       shift
       ;;
     -e|--example)
@@ -73,8 +78,13 @@ binary=$bin_dir/day$day
 make_quiet "$binary"
 
 echo "Day $day:"
+args=()
+if [[ $use_time == y ]]; then
+  args+=(/usr/bin/time)
+fi
+args+=("$binary" "$input_path")
 # limit memory usage to 4 GB
 ulimit -m $((4*1000*1000))
 # run on the specified input
 # have ASan print a backtrace when an assertion fails (which triggers an abort)
-ASAN_OPTIONS=${ASAN_OPTIONS:+${ASAN_OPTIONS}:}handle_abort=1 "$binary" "input/day$day/$input_name"
+ASAN_OPTIONS=${ASAN_OPTIONS:+${ASAN_OPTIONS}:}handle_abort=1 "${args[@]}"
