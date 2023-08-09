@@ -7,8 +7,12 @@ if [[ $# -lt 2 ]]; then
   date +"%-d %Y" | read -r day year
 fi
 day=${1:-$day}
+# remove leading zero
+day=${day#0}
+# pad with zeros to two digits
+day_padded=$(printf '%02d' "$day")
 year=${2:-$year}
-dest_dir="input/day$day"
+dest_dir="input/day$day_padded"
 mkdir -p "$dest_dir"
 filename="$dest_dir/input.txt"
 if ! [[ -e "$filename" ]]; then

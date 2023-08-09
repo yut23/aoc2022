@@ -72,6 +72,9 @@ while [[ $# -gt 0 ]]; do
   first_iter=n
 done
 
+# pad with zeros to two digits
+day=$(printf '%02d' "${day#0}")
+
 input_path="input/day$day/$input_name"
 if ! [[ -e "$input_path" ]]; then
   >&2 echo "ERROR: could not find input file at $input_path"
@@ -83,7 +86,7 @@ binary=$bin_dir/day$day
 # rebuild if make says it's necessary
 make_quiet "$binary"
 
-echo "Day $day:"
+echo "Day ${day#0}:"
 args=()
 if [[ $use_time == y ]]; then
   args+=(/usr/bin/time)

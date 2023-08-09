@@ -6,6 +6,8 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 source ./lib.sh
 
 day=${1:-$(date +%-d)}
+# pad with zeros to two digits
+day=$(printf '%02d' "${day#0}")
 if ! [[ -e input/day$day/input.txt ]]; then
   args=("$day")
   if [[ $# -gt 1 ]]; then
